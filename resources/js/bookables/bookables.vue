@@ -5,7 +5,8 @@
         <div v-else>
             <div class="row mb-4" v-for="row in rows" :key="'row' + row">
                 <div class="col d-flex align-items-stretch" v-for="(bookable, column) in bookableInRows(row)" :key="'row' + row + column"> 
-                    <bookable-list-item  :title="bookable.title" :description="bookable.description" :price="3000" ></bookable-list-item>
+                    <!-- Add component in with props -->
+                    <bookable-list-item  v-bind="bookable"></bookable-list-item>
                 </div>
                 <div class="col" v-for="p in placeholderInRow(row)" :key="'placeholder' + row + p"></div>
             </div>
@@ -16,7 +17,7 @@
 
 
 <script>
-
+//import the component
   import bookableListItem from '../bookables/bookableListItem.vue';
   
 
@@ -54,11 +55,11 @@ export default {
   created() {
       this.loading =true;
 
-      const p = new Promise((resolve, reject) => {
-          console.log(resolve);
-          console.log(reject);
-          setTimeout(() => reject("Hello"), 3000);
-      })
+    //   const p = new Promise((resolve, reject) => {
+    //       console.log(resolve);
+    //       console.log(reject);
+    //       setTimeout(() => reject("Hello"), 3000);
+    //   })
 
     //   .then(result => "Hello again " + result)
     //   .then(result => console.log(result))
@@ -67,7 +68,7 @@ export default {
 
 
        const request = axios.get("/api/bookables").then(response => {
-           this.bookables = response.data;
+           this.bookables = response.data.data; //data here are 2 because the first is the actual axios data and the other is the Json property
            this.loading = false;
        });
 

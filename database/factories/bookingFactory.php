@@ -1,0 +1,20 @@
+<?php
+
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+
+use App\booking;
+use App\Model;
+use Carbon\Carbon;
+use Faker\Generator as Faker;
+
+$factory->define(booking::class, function (Faker $faker) {
+
+    $from =Carbon::instance($faker->dateTimeBetween('-1 months', '+1 months'));
+    $to = (clone $from)->addDays(random_int(0, 14));
+
+    return [
+        //
+        'from' => $from,
+        'to' => $to
+    ];
+});
