@@ -10,22 +10,18 @@
              <div class="form-group col-md-6">
                  <label for="from">From</label>
                  <input type="text" name="from" class="form-control form-control-sm" placeholder="Start date" v-model="from" @keyup.enter="check" 
-                  :class="[{'is-invalid': this.errorFor('from')}]"/>
+                  :class="[{'is-invalid': errorFor('from')}]"/>
                    <!-- binding with a classname is-invalid and it implement when it has the method "errorFor" with field "from" -->
-                   <div class="invalid-feedback" v-for="(error, index) in this.errorFor('from')" :key="'from' + index">
-                       {{error}}
-                   </div>
+                   <v-errors :errors="errorFor('from')"></v-errors>
              </div>
              <div class="form-group col-md-6">
                  <label for="to">To</label>
                     <!-- @keyup.enter tells enable us to press the enter key on d keyboard if we decide to ignore the check button -->
                  <input type="text" name="to" class="form-control form-control-sm" placeholder="End date" v-model="to" @keyup.enter="check" 
-                 :class="[{'is-invalid': this.errorFor('to')}]"/>
+                 :class="[{'is-invalid': errorFor('to')}]"/>
                   <!-- binding with a classname is-invalid and it implement when it has the method "errorFor" with field "to" -->
 
-                  <div class="invalid-feedback" v-for="(error, index) in this.errorFor('to')" :key="'to' + index">
-                      {{error}}
-                   </div>
+                  <v-errors :errors="errorFor('to')"></v-errors>
              </div>
          </div>
 
@@ -34,24 +30,37 @@
  </template>
 
  <script>
+     import {is422} from "./../shared/utilities/response";
+
+     import validationErrors from "./../shared/mixins/validationErrors";
 import bookableVue from './bookable.vue';
  export default {
 
-    props: {bookableId: String},
+     mixins: [validationErrors],
+
+    props: {bookableId: [String, Number]},
      data() {
          return {
-             from: null,
-             to: null,
+             from: this.$store.state.lastSearch.from,
+             to: this.$store.state.lastSearch.to,
              loading: false,
              status: null,
-             error: null
+            
          }
      },
 
      methods: {
          check() {
              this.loading=true;
-             this.error = null;
+             this.errors = null;
+
+// here we are using dispatch for Vuex action
+             this.$store.dispatch('setLastSearch', {
+                 from: this.from,
+                 to: this.to
+             });
+
+// end
 
              axios.get(
                  `/api/bookables/${this.bookableId}/availability?from=${this.from}&to=${this.to}`
@@ -59,17 +68,15 @@ import bookableVue from './bookable.vue';
                  this.status = response.status;
              })
              .catch( error => {
-                 if(422 === error.response.status){ //422 when something is actually wrong
-                     this.error = error.response.data.errors;
+                 if(is422(error)){ //422 when something is actually wrong
+                     this.errors = error.response.data.errors;
                  }
                  this.status = error.response.status; // 400 this will handle when there is no availability
              })
              .then(() =>(this.loading = false)); // it doesn't matter if it fails or not it will make the loading false
          },
 
-         errorFor(field) {
-             return this.hasErrors && this.error[field] ? this.error[field] : null; //methods that will return errors for a specific field
-         }
+       
      },
      computed: {
          hasErrors() {
