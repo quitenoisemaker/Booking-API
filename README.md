@@ -17,4 +17,4 @@ Users can see list of bookings, read information about each bookings with review
 </div>
 </ul>
 
-<p>Project idea was gotten from an <b>Udemy tutorial Fullstack development with VueJs and Laravel</b></p>
+<p>Project idea was gotten from an Udemy tutorial <b>Master Laravel with Vue.js Fullstack Development by Piotr Jura</b></p>
